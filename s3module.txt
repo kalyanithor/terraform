@@ -1,0 +1,32 @@
+----------------var.tf--------------------------
+variable "bucket-name" {
+  default = "punam1701"
+}
+
+variable "id-name" {
+  default = "punam1701"
+}
+
+-------------------s3.tf--------------------------
+
+resource "aws_s3_bucket" "create-s3-bucket" {
+
+  bucket = "${var.bucket-name}"
+
+  acl = "private"
+
+  lifecycle_rule {
+    id = "archive"
+    enabled = true
+    transition {
+      days = 30
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 60
+      storage_class = "GLACIER"
+    }
+
+  }
+}

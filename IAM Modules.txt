@@ -1,0 +1,112 @@
+----------------------Provider.tf--------
+
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "5.30.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+  access_key = "AKIASTBB346IFIHIU3M2"
+  secret_key = "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"
+}
+
+
+-------------------------Var.tf-------
+
+variable "group-1" {
+  default = "developer"
+}
+
+variable "group-2" {
+  default = "backend++"
+}
+
+variable "group-3" {
+  default = "devops"
+}
+
+variable "policy-group1" {
+   default= ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"]
+}
+
+variable "policy-group3" {
+   default= ["arn:aws:iam::aws:policy/AdministratorAccess"]
+}
+
+variable "policy-group2" {
+   default= ["arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess", "arn:aws:iam::178312177552:policy/punam"]
+}
+
+variable "user-group1" {
+  default = ["abhi", "kalyani", "aarti"]
+}
+
+variable "user-group2" {
+  default = ["omkar", "swapnil", "sura"]
+}
+
+variable "user-group3" {
+  default = ["shubham", "ashish", "ajinkya"]
+}
+
+
+---------------Group.tf-----
+
+resource "aws_iam_group" "iam-group1" {
+   name= var.group-1
+}
+
+resource "aws_iam_group" "iam-group2" {
+   name= var.group-2
+}
+
+resource "aws_iam_group" "iam-group3" {
+   name= var.group-3
+}
+
+-----------User.tf------------
+
+resource "aws_iam_user" "iam-user1" {
+ count= length(var.user-group1)
+ name= element(var.user-group1, count.index)
+}
+
+resource "aws_iam_user" "iam-user2" {
+ count= length(var.user-group2)
+ name= element(var.user-group2, count.index)
+}
+
+resource "aws_iam_user" "iam-user3" {
+ count= length(var.user-group3)
+ name= element(var.user-group3, count.index)
+}
+
+------------------Policy.tf------
+
+resource "aws_iam_policy_attachment" "iam-policy" {
+   name= "iam-policy"
+   count= length(var.policy-group1)
+   groups= ["${aws_iam_group.iam-group1.name}"]
+   policy_arn= element(var.policy-group1, count.index)
+}
+
+resource "aws_iam_policy_attachment" "iam-policy2" {
+   name= "iam-policy2"
+   count= length(var.policy-group2)
+   groups= ["${aws_iam_group.iam-group2.name}"]
+   policy_arn= element(var.policy-group2, count.index)
+}
+
+resource "aws_iam_policy_attachment" "iam-policy3" {
+   name= "iam-policy3"
+   count= length(var.policy-group3)
+   groups= ["${aws_iam_group.iam-group3.name}"]
+   policy_arn= element(var.policy-group3, count.index)
+}
+
+
